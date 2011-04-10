@@ -5,6 +5,8 @@
  * it could be done.
  *
  * Requires devel and php's curl library.
+ *
+ * Licensed under the GNU GPL version 3.0.
  */
 
 /**
