@@ -1,0 +1,90 @@
+<?php
+/**
+ * Proof of concept code for Dave Chakrabarti for interacting with the Indaba
+ * platform service api. I don't know anything about it, this just shows how
+ * it could be done.
+ *
+ * Requires devel and php's curl library.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function indaba_api_menu() {
+  $items['reports/%'] = array(
+    'title' => 'Reports',
+    'description' => 'Create event and volunteer sessions',
+    'page callback' => 'indaba_api_report',
+    'page arguments' => array(1),
+    'access callback' => TRUE, // Anyone can view
+  );
+  return $items;
+}
+
+/**
+ * Generate Indaba country report
+ */
+function indaba_api_report($country) {
+  $country_id = _indaba_api_get_country_id($country);
+
+  $handle = curl_init();
+  $url = 'http://indabaplatform.com/ids/vcardSummary.do?horseId='. 
+    $country_id . '&version=1';
+  $options = array(
+    CURLOPT_URL => $url,
+    CURLOPT_TIMEOUT => 30,
+    CURLOPT_RETURNTRANSFER => 1,
+    CURLOPT_FRESH_CONNECT => 1,
+    CURLOPT_FORBID_REUSE => 1,
+    CURLOPT_VERBOSE => 1,
+  );
+
+  curl_setopt_array($handle, $options);
+
+  $response = curl_exec($handle);
+  $error = curl_error($handle);
+  $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+
+  if (!$error) {
+    $data = json_decode($response);
+
+    dpm($data, 'Data array: categories element will need to be processed into
+      something that can be understood by theme_table.');
+    
+    drupal_set_title($data->title);
+    
+    // Clunkily process data into renderable array...
+    return array(
+      'title' => array(
+        '#type' => 'markup',
+        '#markup' => $data->title,
+      ),
+      'survey_name' => array(
+        '#type' => 'markup',
+        '#markup' => $data->title,
+      ),  
+    );
+  }
+  else {
+    return array(
+      '#type' => 'markup',
+      '#markup' => t('Error getting data'),
+    );
+  }
+}
+
+/**
+ * Mock country map
+ */
+function _indaba_api_get_country_id($country = NULL) {
+  switch (strtoupper($country)) {
+    case 'ALBANIA':
+      return 1;
+    case 'ANGOLA':
+      return 2;
+    case 'BANGLADESH':
+      return 3;
+    default:
+      return 1;
+  }
+}
