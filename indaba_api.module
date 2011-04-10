@@ -52,19 +52,33 @@ function indaba_api_report($country) {
 
     dpm($data, 'Data array: categories element will need to be processed into
       something that can be understood by theme_table.');
-    
+
+    $aggregate_table = array(
+      '#theme' => 'table',
+      '#headers' => array(t('Name'), t('Score'), t('Assessment')),
+      '#rows' => array(),
+    );
+    foreach ($data->aggrs as $aggr) {
+      $aggregate_table['#rows'][] = array(
+        $aggr->name,
+        round($aggr->value, 1),
+        $aggr->label,
+      );
+    }
+
     drupal_set_title($data->title);
     
     // Clunkily process data into renderable array...
     return array(
-      'title' => array(
-        '#type' => 'markup',
-        '#markup' => $data->title,
-      ),
       'survey_name' => array(
         '#type' => 'markup',
-        '#markup' => $data->title,
-      ),  
+        '#markup' => '<div class="survey">'. $data->surveyName .'</div>',
+      ),
+      'survey_period' => array(
+        '#type' => 'markup',
+        '#markup' => '<div class="survey-period">'. $data->studyPeroid .'</div>',
+      ),
+      'aggregates' => $aggregate_table,  
     );
   }
   else {
