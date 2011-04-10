@@ -67,6 +67,8 @@ function indaba_api_report($country) {
       );
     }
 
+    dpm($aggregate_table, 'DC: This is the $data->aggrs element, processed so it can be themed by Drupal');
+
     drupal_set_title($data->title);
     
     // Clunkily process data into renderable array...
