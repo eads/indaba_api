@@ -59,10 +59,11 @@ function indaba_api_report($country) {
       '#rows' => array(),
     );
     foreach ($data->aggrs as $aggr) {
+      $class = str_replace(' ', '-', strtolower($aggr->label));
       $aggregate_table['#rows'][] = array(
-        $aggr->name,
-        round($aggr->value, 1),
-        $aggr->label,
+        array('class' => $class .' name', 'data' => $aggr->name),
+        array('class' => $class .' value', 'data' => round($aggr->value, 1)),
+        array('class' => $class .' label', 'data' => $aggr->label),
       );
     }
 
